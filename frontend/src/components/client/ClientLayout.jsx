@@ -333,6 +333,10 @@ function ClientLayout() {
   const footerTextColor = useColorModeValue('gray.500', 'gray.400');
   const navHoverBg = useColorModeValue('gray.100', 'gray.700');
   const mobileNavTextColor = useColorModeValue('black', footerTextColor);
+  const logoSidebarSrc = useColorModeValue(
+    '/images/logo-matinma-4-black.png',
+    '/images/logo-matinma-4-white.png'
+  );
 
   const displayName = currentUser
     ? `${currentUser.nom || ''} ${currentUser.prenom || ''}`.trim() || currentUser.email || 'Client'
@@ -374,7 +378,7 @@ function ClientLayout() {
           <Box w="100%" p={4} pb={1}>
             {isSidebarCollapsed ? (
               <Image
-                src="/images/Logo-Mat-inma.png"
+                src={logoSidebarSrc}
                 alt="Mat'inma logo"
                 maxH="32px"
                 mx="auto"
@@ -386,7 +390,7 @@ function ClientLayout() {
                   Mat'inma
                 </Heading>
                 <Image
-                  src="/images/Logo-Mat-inma.png"
+                  src={logoSidebarSrc}
                   alt="Mat'inma logo"
                   boxSize="28px"
                   objectFit="contain"

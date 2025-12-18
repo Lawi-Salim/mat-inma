@@ -2,6 +2,7 @@
 node_modules
 yarn-error.log
 Lawi.session.sql
+frontend/.vite
 
 backend/.env
 frontend/.env

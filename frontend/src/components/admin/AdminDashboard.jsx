@@ -560,7 +560,7 @@ function AdminDashboard({ stats, recentOrders }) {
 
           <Box borderWidth="1px" borderRadius="md" p={4} bg={cardBg}>
             <HStack justify="space-between" mb={2}>
-              <Heading size={{ base: 'sm', md: 'md' }}>Résumé des commandes</Heading>
+              <Heading size={{ base: 'sm', md: 'md' }}>Commandes</Heading>
               <HStack spacing={2}>
                 {/* Filtres visibles sur desktop */}
                 <HStack spacing={2} display={{ base: 'none', md: 'flex' }}>

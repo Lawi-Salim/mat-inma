@@ -61,6 +61,10 @@ function AdminLayout() {
   const headerBg = useColorModeValue('gray.50', 'gray.900');
   const footerTextColor = useColorModeValue('gray.500', 'gray.400');
   const navHoverBg = useColorModeValue('gray.100', 'gray.700');
+  const logoSidebarSrc = useColorModeValue(
+    '/images/logo-matinma-4-black.png',
+    '/images/logo-matinma-4-white.png'
+  );
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   const displayName = currentUser
@@ -103,7 +107,7 @@ function AdminLayout() {
           <Box w="100%" p={4} pb={1}>
             {isSidebarCollapsed ? (
               <Image
-                src="/images/Logo-Mat-inma.png"
+                src={logoSidebarSrc}
                 alt="Mat'inma logo"
                 maxH="32px"
                 mx="auto"
@@ -115,7 +119,7 @@ function AdminLayout() {
                   Mat'inma
                 </Heading>
                 <Image
-                  src="/images/Logo-Mat-inma.png"
+                  src={logoSidebarSrc}
                   alt="Mat'inma logo"
                   boxSize="28px"
                   objectFit="contain"
