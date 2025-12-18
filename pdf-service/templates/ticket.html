@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket de Caisse - Mat'inma</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        /* Format ticket thermique 80mm, hauteur auto */
+        @page {
+            size: 80mm auto;
+            margin: 0;
+        }
+
+        .ticket-wrapper {
+            width: 80mm;
+            margin: 0 auto;
+        }
+
+        .ticket {
+            width: 80mm;
+            background: white;
+            padding: 5mm;
+            border: 1px solid #ddd;
+        }
+
+        .ticket-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .separator {
+            font-size: 8px;
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+
+        .logo {
+            margin: 5px 0;
+            max-height: 40px;
+            object-fit: contain;
+        }
+
+        .ticket-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .divider {
+            font-size: 8px;
+            letter-spacing: -1px;
+            margin: 5px 0;
+            line-height: 1.2;
+        }
+
+        .divider-double {
+            font-size: 8px;
+            letter-spacing: -1px;
+            margin: 5px 0;
+            line-height: 1;
+        }
+
+        .items {
+            margin: 10px 0;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+            font-size: 11px;
+        }
+
+        .item-name {
+            flex: 1;
+        }
+
+        .item-qty {
+            width: 60px;
+            text-align: center;
+        }
+
+        .item-price {
+            width: 80px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .info-section {
+            margin: 10px 0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin: 5px 0;
+        }
+
+        .info-label {
+            flex: 1;
+        }
+
+        .info-value {
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .footer {
+            text-align: center;
+            margin: 15px 0 10px 0;
+        }
+
+        .marhaban-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .marhaban-stars {
+            font-size: 8px;
+        }
+
+        .marhaban-logo {
+            max-height: 30px;
+            object-fit: contain;
+        }
+
+        .qr-code {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+        }
+
+        .qr-code img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+    <div class="ticket-wrapper">
+        <div class="ticket">
+            <!-- En-tête -->
+            <div class="ticket-header">
+                <div class="separator">*********************************************************************</div>
+                <img src="static/images/logo-matinma-2-black.png" alt="Mat'inma" class="logo">
+                <div class="separator">*********************************************************************</div>
+            </div>
+
+            <!-- Infos commande -->
+            <div class="ticket-info">
+                <span>{{ numero_commande }}</span>
+                <span>{{ date }}</span>
+                <span>{{ heure }}</span>
+            </div>
+
+            <!-- Séparateur -->
+            <div class="divider">---------------------------------------------------------------------</div>
+
+            <!-- Items -->
+            <div class="items">
+                {% for item in items %}
+                <div class="item">
+                    <span class="item-name">{{ item.nom }}</span>
+                    <span class="item-qty">{{ '{:,.0f}'.format(item.prix_unitaire).replace(',', ' ') }} x{{ item.quantite }}</span>
+                    <span class="item-price">{{ '{:,.0f}'.format(item.prix).replace(',', ' ') }} KMF</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Séparateur double -->
+            <div class="divider-double">---------------------------------------------------------------------<br>---------------------------------------------------------------------</div>
+
+            <!-- Total -->
+            <div class="total">
+                <span>PRIX TOTAL</span>
+                <span>{{ '{:,.0f}'.format(total).replace(',', ' ') }} KMF</span>
+            </div>
+
+            <!-- Informations -->
+            <div class="info-section">
+                <div class="info-row">
+                    <span class="info-label">Moyen de paiement</span>
+                    <span class="info-value">{{ paiement }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Type de commande</span>
+                    <span class="info-value">{{ type_commande }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">N° table</span>
+                    <span class="info-value">{{ numero_table }}</span>
+                </div>
+            </div>
+
+            <!-- Séparateur double -->
+            <div class="divider-double">---------------------------------------------------------------------<br>---------------------------------------------------------------------</div>
+
+            <div class="info-section">
+                <div class="info-row">
+                    <span class="info-label">N° ticket</span>
+                    <span class="info-value">{{ numero_ticket }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Adresse</span>
+                    <span class="info-value">{{ adresse }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Téléphone</span>
+                    <span class="info-value">{{ telephone }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Site web</span>
+                    <span class="info-value">{{ site_web }}</span>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <div class="marhaban-container">
+                    <span class="marhaban-stars">**************</span>
+                    <img src="static/images/Marhaban-black.png" alt="Marhaban !" class="marhaban-logo">
+                    <span class="marhaban-stars">**************</span>
+                </div>
+                <div class="qr-code">
+                    {% if qr_code_data_uri %}
+                        <img src="{{ qr_code_data_uri }}" alt="QR Code">
+                    {% else %}
+                        <span>QR Code</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

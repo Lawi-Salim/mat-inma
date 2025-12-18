@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket de Caisse - Mat'inma</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .ticket {
+            width: 80mm;
+            background: white;
+            padding: 5mm;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+        }
+
+        .ticket-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .separator {
+            font-size: 8px;
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+
+        .logo {
+            margin: 5px 0;
+            max-height: 40px;
+            object-fit: contain;
+        }
+
+        .ticket-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .divider {
+            font-size: 8px;
+            letter-spacing: -1px;
+            margin: 5px 0;
+            line-height: 1.2;
+        }
+
+        .divider-double {
+            font-size: 8px;
+            letter-spacing: -1px;
+            margin: 5px 0;
+            line-height: 1;
+        }
+
+        .items {
+            margin: 10px 0;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 11px;
+        }
+
+        .item-left {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .item-name {
+            flex: 1;
+        }
+
+        .item-qty {
+            min-width: 25px;
+        }
+
+        .item-price {
+            font-weight: bold;
+            text-align: right;
+            min-width: 80px;
+        }
+
+        .total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .info-section {
+            margin: 10px 0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin: 5px 0;
+        }
+
+        .info-label {
+            flex: 1;
+        }
+
+        .info-value {
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .footer {
+            text-align: center;
+            margin: 15px 0 10px 0;
+        }
+
+        .marhaban-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .marhaban-stars {
+            font-size: 8px;
+        }
+
+        .marhaban-logo {
+            max-height: 30px;
+            object-fit: contain;
+        }
+
+        .qr-code {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+        }
+
+        .qr-code img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .ticket {
+                box-shadow: none;
+                border: none;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ticket">
+        <!-- En-tête -->
+        <div class="ticket-header">
+            <div class="separator">*********************************************************************</div>
+            <img src="./images/logo-mat'inma-2-black.png" alt="Mat'inma" class="logo">
+            <div class="separator">*********************************************************************</div>
+        </div>
+
+        <!-- Infos commande -->
+        <div class="ticket-info">
+            <span>CMD-171225-12932</span>
+            <span>17-12-2025</span>
+            <span>00:46:30</span>
+        </div>
+
+        <!-- Séparateur -->
+        <div class="divider">---------------------------------------------------------------------</div>
+
+        <!-- Items -->
+        <div class="items">
+            <div class="item">
+                <div class="item-left">
+                    <span class="item-name">Crêpes</span>
+                    <span class="item-qty"> {prix} x2</span>
+                </div>
+                <span class="item-price">200 KMF</span>
+            </div>
+            <div class="item">
+                <div class="item-left">
+                    <span class="item-name">Pilawo</span>
+                    <span class="item-qty"> {prix} x1</span>
+                </div>
+                <span class="item-price">1200 KMF</span>
+            </div>
+            <div class="item">
+                <div class="item-left">
+                    <span class="item-name">Crêpes</span>
+                    <span class="item-qty"> {prix} x2</span>
+                </div>
+                <span class="item-price">200 KMF</span>
+            </div>
+            <div class="item">
+                <div class="item-left">
+                    <span class="item-name">Pilawo</span>
+                    <span class="item-qty"> {prix} x1</span>
+                </div>
+                <span class="item-price">1200 KMF</span>
+            </div>
+            <div class="item">
+                <div class="item-left">
+                    <span class="item-name">Crêpes</span>
+                    <span class="item-qty"> {prix} x2</span>
+                </div>
+                <span class="item-price">200 KMF</span>
+            </div>
+            <div class="item">
+                <div class="item-left">
+                    <span class="item-name">Pilawo</span>
+                    <span class="item-qty"> {prix} x1</span>
+                </div>
+                <span class="item-price">1200 KMF</span>
+            </div>
+            <div class="item">
+                <div class="item-left">
+                    <span class="item-name">Crêpes</span>
+                    <span class="item-qty"> {prix} x2</span>
+                </div>
+                <span class="item-price">200 KMF</span>
+            </div>
+            <div class="item">
+                <div class="item-left">
+                    <span class="item-name">Pilawo</span>
+                    <span class="item-qty"> {prix} x1</span>
+                </div>
+                <span class="item-price">1200 KMF</span>
+            </div>
+            <div class="item">
+                <div class="item-left">
+                    <span class="item-name">Crêpes</span>
+                    <span class="item-qty"> {prix} x2</span>
+                </div>
+                <span class="item-price">200 KMF</span>
+            </div>
+            <div class="item">
+                <div class="item-left">
+                    <span class="item-name">Pilawo</span>
+                    <span class="item-qty"> {prix} x1</span>
+                </div>
+                <span class="item-price">1200 KMF</span>
+            </div>
+        </div>
+
+        <!-- Séparateur double -->
+        <div class="divider-double">---------------------------------------------------------------------<br>---------------------------------------------------------------------</div>
+
+        <!-- Total -->
+        <div class="total">
+            <span>PRIX TOTAL</span>
+            <span>7000 KMF</span>
+        </div>
+        <br>
+        <!-- Informations -->
+        <div class="info-section">
+            <div class="info-row">
+                <span class="info-label">Moyen de paiement</span>
+                <span class="info-value">espèces</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Type de commande</span>
+                <span class="info-value">sur place</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">N° table</span>
+                <span class="info-value">10</span>
+            </div>
+        </div>
+
+        <!-- Séparateur double -->
+        <div class="divider-double">---------------------------------------------------------------------<br>---------------------------------------------------------------------</div>
+
+        <div class="info-section">
+            <div class="info-row">
+                <span class="info-label">Adresse</span>
+                <span class="info-value">Moroni Oasis</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Téléphone</span>
+                <span class="info-value">434 00 04 / 434 00 05</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Site web</span>
+                <span class="info-value">https://mat-inma.com</span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="marhaban-container">
+                <span class="marhaban-stars">**************</span>
+                <img src="./images/Marhaban-black.png" alt="Marhaban !" class="marhaban-logo">
+                <span class="marhaban-stars">**************</span>
+            </div>
+            <div class="qr-code">
+                <img src="/api/placeholder/100/100" alt="QR Code">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Exemple de données dynamiques
+        const ticketData = {
+            numero: 'CMD-171225-12932',
+            date: '17-12-2025',
+            heure: '00:46:30',
+            items: [
+                { nom: 'Crêpes', quantite: 2, prix: 200 },
+                { nom: 'Pilawo', quantite: 1, prix: 1200 },
+                { nom: 'Crêpes', quantite: 2, prix: 200 },
+                { nom: 'Pilawo', quantite: 1, prix: 1200 },
+                { nom: 'Crêpes', quantite: 2, prix: 200 },
+                { nom: 'Pilawo', quantite: 1, prix: 1200 },
+                { nom: 'Crêpes', quantite: 2, prix: 200 },
+                { nom: 'Pilawo', quantite: 1, prix: 1200 },
+                { nom: 'Crêpes', quantite: 2, prix: 200 },
+                { nom: 'Pilawo', quantite: 1, prix: 1200 }
+            ],
+            total: 7000,
+            paiement: 'espèces',
+            type: 'sur place',
+            table: '10'
+        };
+
+        // Fonction pour générer le ticket dynamiquement
+        function generateTicket(data) {
+            // Mise à jour des infos
+            document.querySelector('.ticket-info').innerHTML = `
+                <span>${data.numero}</span>
+                <span>${data.date}</span>
+                <span>${data.heure}</span>
+            `;
+
+            // Mise à jour des items
+            const itemsContainer = document.querySelector('.items');
+            itemsContainer.innerHTML = data.items.map(item => `
+                <div class="item">
+                    <div class="item-left">
+                        <span class="item-name">${item.nom}</span>
+                        <span class="item-qty"> {prix} x${item.quantite}</span>
+                    </div>
+                    <span class="item-price">${item.prix.toLocaleString('fr-FR')} KMF</span>
+                </div>
+            `).join('');
+
+            // Mise à jour du total
+            document.querySelector('.total span:last-child').textContent = 
+                `${data.total.toLocaleString('fr-FR')} KMF`;
+
+            // Mise à jour des infos
+            const infoValues = document.querySelectorAll('.info-value');
+            infoValues[0].textContent = data.paiement;
+            infoValues[1].textContent = data.type;
+            infoValues[2].textContent = data.table;
+        }
+
+        // Décommenter pour générer dynamiquement
+        // generateTicket(ticketData);
+    </script>
+</body>
+</html>
