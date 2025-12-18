@@ -1,3 +1,36 @@
+<p align="center">
+  <img src="./frontend/public/images/logo-matinma-2-white.png" alt="Mat-inma Logo" width="160" />
+</p>
+
+<h1 align="center">Mat-inma – Gestion de Restaurant</h1>
+
+<p align="center">
+  Gérez le menu, les commandes, les paiements et les statistiques de votre restaurant
+  avec trois espaces dédiés : <b>Administrateur</b>, <b>Employé</b> et <b>Client</b>.
+</p>
+
+<p align="center">
+  <a href="#mission-du-projet">Mission du projet</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#service-pdf--génération-de-tickets">Service PDF</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Frontend-React%20%2B%20Vite-61dafb?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/UI-Chakra%20UI-319795?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Backend-Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white" />
+  <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/Database-PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white" />
+  <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis" />
+</p>
+
+---
+
+# Mat-inma
+
+## 🎯 Mission du Projet
+
 # Mat-inma
 
 Application de gestion de restaurant avec trois espaces principaux : **Administrateur**, **Employé** (cuisine & caisse) et **Client**.  
