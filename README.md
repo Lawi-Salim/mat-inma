@@ -31,8 +31,6 @@
 
 ## 🎯 Mission du Projet
 
-# Mat-inma
-
 Application de gestion de restaurant avec trois espaces principaux : **Administrateur**, **Employé** (cuisine & caisse) et **Client**.  
 Le projet gère le menu, les commandes, les paiements et un premier niveau de statistiques.
 
