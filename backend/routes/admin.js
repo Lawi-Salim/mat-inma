@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const { sequelize, User } = require('../models');
+const redisClient = require('../config/redis');
 
 // Helper pour les statuts lisibles
 const STATUS_LABELS = {
@@ -27,6 +28,20 @@ function formatCommandeNumero(createdAt, seedNumber) {
 
 // GET /api/admin/dashboard
 router.get('/dashboard', async (req, res) => {
+  const cacheKey = 'admin:dashboard:v1';
+
+  // Tentative de lecture dans Redis
+  try {
+    if (redisClient && redisClient.isOpen) {
+      const cached = await redisClient.get(cacheKey);
+      if (cached) {
+        return res.json(JSON.parse(cached));
+      }
+    }
+  } catch (err) {
+    console.error('Erreur lecture cache Redis (admin:dashboard):', err);
+  }
+
   try {
     const [[statsRow]] = await sequelize.query(`
       SELECT
@@ -87,8 +102,18 @@ router.get('/dashboard', async (req, res) => {
         statusLabel: STATUS_LABELS[row.statut] || row.statut,
       };
     });
+    const payload = { stats, recentOrders };
 
-    res.json({ stats, recentOrders });
+    // Mise en cache dans Redis avec un TTL court (ex: 60s)
+    try {
+      if (redisClient && redisClient.isOpen) {
+        await redisClient.set(cacheKey, JSON.stringify(payload), { EX: 60 });
+      }
+    } catch (err) {
+      console.error('Erreur écriture cache Redis (admin:dashboard):', err);
+    }
+
+    res.json(payload);
   } catch (error) {
     console.error('Erreur dashboard admin:', error);
     res.status(500).json({ message: "Erreur lors du chargement du tableau de bord.", error: error.message });

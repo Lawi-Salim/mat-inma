@@ -2,13 +2,35 @@
 const express = require('express');
 const router = express.Router();
 const { Categorie, Plat } = require('../models');
+const redisClient = require('../config/redis');
 
 // ----- CATEGORIES -----
 router.get('/categories', async (req, res) => {
+  const cacheKey = 'menu:categories';
+
+  try {
+    if (redisClient && redisClient.isOpen) {
+      const cached = await redisClient.get(cacheKey);
+      if (cached) {
+        return res.json(JSON.parse(cached));
+      }
+    }
+  } catch (error) {
+    console.error('Erreur lecture cache Redis (categories):', error);
+  }
+
   try {
     const categories = await Categorie.findAll({
       order: [['ordre_affichage', 'ASC'], ['nom', 'ASC']],
     });
+    try {
+      if (redisClient && redisClient.isOpen) {
+        await redisClient.set(cacheKey, JSON.stringify(categories), { EX: 120 });
+      }
+    } catch (error) {
+      console.error('Erreur écriture cache Redis (categories):', error);
+    }
+
     res.json(categories);
   } catch (error) {
     console.error('Erreur récupération catégories:', error);
@@ -39,6 +61,15 @@ router.post('/categories', async (req, res) => {
       actif: typeof actif === 'boolean' ? actif : true,
     });
 
+    try {
+      if (redisClient && redisClient.isOpen) {
+        await redisClient.del('menu:categories');
+        await redisClient.del('menu:plats:all:all');
+      }
+    } catch (err) {
+      console.error('Erreur invalidation cache menu (création catégorie):', err);
+    }
+
     res.status(201).json(categorie);
   } catch (error) {
     console.error('Erreur création catégorie:', error);
@@ -61,6 +92,15 @@ router.put('/categories/:id', async (req, res) => {
     if (actif !== undefined) categorie.actif = actif;
 
     await categorie.save();
+    try {
+      if (redisClient && redisClient.isOpen) {
+        await redisClient.del('menu:categories');
+        await redisClient.del('menu:plats:all:all');
+      }
+    } catch (err) {
+      console.error('Erreur invalidation cache menu (mise à jour catégorie):', err);
+    }
+
     res.json(categorie);
   } catch (error) {
     console.error('Erreur mise à jour catégorie:', error);
@@ -77,6 +117,15 @@ router.delete('/categories/:id', async (req, res) => {
     }
 
     await categorie.destroy();
+    try {
+      if (redisClient && redisClient.isOpen) {
+        await redisClient.del('menu:categories');
+        await redisClient.del('menu:plats:all:all');
+      }
+    } catch (err) {
+      console.error('Erreur invalidation cache menu (suppression catégorie):', err);
+    }
+
     res.status(204).send();
   } catch (error) {
     console.error('Erreur suppression catégorie:', error);
@@ -97,10 +146,37 @@ router.get('/plats', async (req, res) => {
       where.disponible = disponible === 'true';
     }
 
+    const cacheKeyParts = [
+      'menu:plats',
+      categorieId || 'all',
+      disponible !== undefined ? String(disponible) : 'all',
+    ];
+    const cacheKey = cacheKeyParts.join(':');
+
+    try {
+      if (redisClient && redisClient.isOpen) {
+        const cached = await redisClient.get(cacheKey);
+        if (cached) {
+          return res.json(JSON.parse(cached));
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lecture cache Redis (plats):', error);
+    }
+
     const plats = await Plat.findAll({
       where,
       order: [['nom', 'ASC']],
     });
+
+    try {
+      if (redisClient && redisClient.isOpen) {
+        await redisClient.set(cacheKey, JSON.stringify(plats), { EX: 120 });
+      }
+    } catch (error) {
+      console.error('Erreur écriture cache Redis (plats):', error);
+    }
+
     res.json(plats);
   } catch (error) {
     console.error('Erreur récupération plats:', error);
@@ -112,6 +188,14 @@ router.post('/plats', async (req, res) => {
   try {
     const { nom, description, prix, categorie_id, image_url, disponible } = req.body;
     const plat = await Plat.create({ nom, description, prix, categorie_id, image_url, disponible });
+    try {
+      if (redisClient && redisClient.isOpen) {
+        await redisClient.del('menu:plats:all:all');
+      }
+    } catch (err) {
+      console.error('Erreur invalidation cache menu (création plat):', err);
+    }
+
     res.status(201).json(plat);
   } catch (error) {
     console.error('Erreur création plat:', error);
@@ -136,6 +220,14 @@ router.put('/plats/:id', async (req, res) => {
     if (disponible !== undefined) plat.disponible = disponible;
 
     await plat.save();
+    try {
+      if (redisClient && redisClient.isOpen) {
+        await redisClient.del('menu:plats:all:all');
+      }
+    } catch (err) {
+      console.error('Erreur invalidation cache menu (mise à jour plat):', err);
+    }
+
     res.json(plat);
   } catch (error) {
     console.error('Erreur mise à jour plat:', error);
@@ -152,6 +244,14 @@ router.delete('/plats/:id', async (req, res) => {
     }
 
     await plat.destroy();
+    try {
+      if (redisClient && redisClient.isOpen) {
+        await redisClient.del('menu:plats:all:all');
+      }
+    } catch (err) {
+      console.error('Erreur invalidation cache menu (suppression plat):', err);
+    }
+
     res.status(204).send();
   } catch (error) {
     console.error('Erreur suppression plat:', error);

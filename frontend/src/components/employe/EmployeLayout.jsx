@@ -29,6 +29,8 @@ import { FiSidebar, FiCheckSquare, FiDollarSign } from 'react-icons/fi';
 import AdminThemeToggle from '../admin/AdminThemeToggle';
 import useCurrentUser from '../../hooks/useCurrentUser';
 import HeaderUserBadge from '../HeaderUserBadge';
+import { clearAuthData } from '../../utils/auth';
+import axios from 'axios';
 
 function EmployeLayout() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -62,6 +64,8 @@ function EmployeLayout() {
       .join('')
       .toUpperCase();
   })();
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
   return (
     <Flex h="100vh" bg={layoutBg} overflow="hidden">
@@ -191,9 +195,20 @@ function EmployeLayout() {
               <HeaderUserBadge
                 displayName={displayName}
                 onProfile={() => setIsProfileOpen(true)}
-                onLogout={() => {
-                  localStorage.removeItem('token');
-                  navigate('/login');
+                onLogout={async () => {
+                  try {
+                    const userId = localStorage.getItem('userId');
+                    const tokenId = localStorage.getItem('tokenId');
+
+                    if (userId && tokenId) {
+                      await axios.post(`${API_URL}/auth/logout`, { userId, tokenId });
+                    }
+                  } catch (err) {
+                    console.error('Erreur déconnexion backend (employe):', err);
+                  } finally {
+                    clearAuthData();
+                    navigate('/login');
+                  }
                 }}
               />
             </HStack>

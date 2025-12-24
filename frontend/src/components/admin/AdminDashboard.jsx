@@ -116,10 +116,8 @@ function AdminDashboard({ stats, recentOrders }) {
     const start = new Date(now);
 
     if (range === 'week') {
-      // début de la semaine (lundi)
-      const day = start.getDay();
-      const diff = (day + 6) % 7; // 0 (dimanche) -> 6, 1 (lundi) -> 0, ...
-      start.setDate(start.getDate() - diff);
+      // 7 derniers jours (même logique que pour les graphes)
+      start.setDate(start.getDate() - 6);
       start.setHours(0, 0, 0, 0);
     } else if (range === 'quarter') {
       // 3 derniers mois
@@ -181,7 +179,7 @@ function AdminDashboard({ stats, recentOrders }) {
   const kpiAggregates = computeKpiAggregates(safeRecentOrders, kpiRange);
 
   const getKpiRangeLabel = () => {
-    if (kpiRange === 'week') return 'Cette semaine';
+    if (kpiRange === 'week') return '7 derniers jours';
     if (kpiRange === 'quarter') return '3 derniers mois';
     if (kpiRange === 'year') return "Cette année";
     return '';

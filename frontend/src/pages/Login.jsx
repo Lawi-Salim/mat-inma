@@ -18,6 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import axios from 'axios';
+import { saveAuthData } from '../utils/auth';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -39,8 +40,8 @@ function Login() {
                 password,
             });
 
-            if (res.data?.token) {
-                localStorage.setItem('token', res.data.token);
+            if (res.data) {
+                saveAuthData(res.data);
             }
 
             const role = res.data?.user?.role;

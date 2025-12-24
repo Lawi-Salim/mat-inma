@@ -5,6 +5,7 @@ const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const { sequelize } = require('./models')
+const redisClient = require('./config/redis');
 const authRoutes = require('./routes/auth');
 const menuRoutes = require('./routes/menu');
 const adminRoutes = require('./routes/admin');
@@ -26,7 +27,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/employe', employeRoutes);
 app.use('/api/client', clientRoutes);
 
-// Route de test
+// Route de test API / santé
 app.get('/api/health', async (req, res) => {
     try {
         await sequelize.authenticate();
@@ -41,6 +42,35 @@ app.get('/api/health', async (req, res) => {
         res.status(500).json({
             message: 'Erreur de connexion à la base de données',
             error: error.message
+        });
+    }
+});
+
+// Route de test Redis
+app.get('/api/redis-test', async (req, res) => {
+    try {
+        if (!redisClient || !redisClient.isOpen) {
+            return res.status(500).json({
+                message: 'Client Redis non disponible',
+            });
+        }
+
+        const key = 'test:ping';
+        const value = `pong-${Date.now()}`;
+
+        await redisClient.set(key, value, { EX: 60 });
+        const stored = await redisClient.get(key);
+
+        return res.json({
+            message: 'Redis opérationnel',
+            key,
+            value: stored,
+        });
+    } catch (error) {
+        console.error('❌ Erreur test Redis:', error);
+        return res.status(500).json({
+            message: 'Erreur lors du test Redis',
+            error: error.message,
         });
     }
 });

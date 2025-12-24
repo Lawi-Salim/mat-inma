@@ -46,6 +46,8 @@ import {
 } from '@chakra-ui/react';
 
 import useCurrentUser from '../../hooks/useCurrentUser';
+import { clearAuthData } from '../../utils/auth';
+import axios from 'axios';
 
 function AdminLayout() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -66,6 +68,7 @@ function AdminLayout() {
     '/images/logo-matinma-4-white.png'
   );
   const isMobile = useBreakpointValue({ base: true, md: false });
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
   const displayName = currentUser
     ? `${currentUser.nom || ''} ${currentUser.prenom || ''}`.trim() || currentUser.email || 'Utilisateur'
@@ -271,9 +274,20 @@ function AdminLayout() {
               <HeaderUserBadge
                 displayName={displayName}
                 onProfile={() => setIsProfileOpen(true)}
-                onLogout={() => {
-                  localStorage.removeItem('token');
-                  navigate('/login');
+                onLogout={async () => {
+                  try {
+                    const userId = localStorage.getItem('userId');
+                    const tokenId = localStorage.getItem('tokenId');
+
+                    if (userId && tokenId) {
+                      await axios.post(`${API_URL}/auth/logout`, { userId, tokenId });
+                    }
+                  } catch (err) {
+                    console.error('Erreur déconnexion backend:', err);
+                  } finally {
+                    clearAuthData();
+                    navigate('/login');
+                  }
                 }}
               />
             </HStack>

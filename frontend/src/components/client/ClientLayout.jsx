@@ -52,6 +52,8 @@ import {
 import AdminThemeToggle from '../admin/AdminThemeToggle';
 import useCurrentUser from '../../hooks/useCurrentUser';
 import HeaderUserBadge from '../HeaderUserBadge';
+import { clearAuthData } from '../../utils/auth';
+import axios from 'axios';
 import { CartProvider, useCart } from '../../context/CartContext';
 import ClientMobileBottomNav from './client-mobile/ClientMobileBottomNav';
 import ClientPlusDrawer from './client-mobile/ClientPlusDrawer';
@@ -126,9 +128,20 @@ function ClientMainContent({
               <HeaderUserBadge
                 displayName={displayName}
                 onProfile={() => setIsProfileOpen(true)}
-                onLogout={() => {
-                  localStorage.removeItem('token');
-                  navigate('/login');
+                onLogout={async () => {
+                  try {
+                    const userId = localStorage.getItem('userId');
+                    const tokenId = localStorage.getItem('tokenId');
+
+                    if (userId && tokenId) {
+                      await axios.post(`${API_URL}/auth/logout`, { userId, tokenId });
+                    }
+                  } catch (err) {
+                    console.error('Erreur déconnexion backend (client):', err);
+                  } finally {
+                    clearAuthData();
+                    navigate('/login');
+                  }
                 }}
               />
             </HStack>
@@ -328,7 +341,7 @@ function ClientLayout() {
 
   const layoutBg = useColorModeValue('gray.50', 'gray.900');
   const sidebarBg = useColorModeValue('white', 'gray.800');
-  const sidebarBorderColor = useColorModeValue('gray.200', 'gray.700');
+  const sidebarBorderColor = useColorModeValue('white', 'gray.800');
   const headerBg = useColorModeValue('gray.50', 'gray.900');
   const footerTextColor = useColorModeValue('gray.500', 'gray.400');
   const navHoverBg = useColorModeValue('gray.100', 'gray.700');
@@ -356,6 +369,7 @@ function ClientLayout() {
 
   const isMobile = useBreakpointValue({ base: true, md: false });
   const location = useLocation();
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
   const isPlusActive =
     plusDrawer.isOpen || location.pathname.startsWith('/client/parametres');

@@ -4,6 +4,13 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 const { authMiddleware } = require('../middleware/auth');
+const {
+    generateAccessToken,
+    generateAndStoreRefreshToken,
+    verifyRefreshToken,
+    revokeRefreshToken,
+    REFRESH_TOKEN_TTL_SECONDS,
+} = require('../config/tokenService');
 
 // Route d'inscription
 router.post('/register', async (req, res) => {
@@ -34,17 +41,17 @@ router.post('/register', async (req, res) => {
             role: role || 'client'
         });
 
-        // Générer le token JWT
-        const token = jwt.sign(
-            { userId: user.id, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: '7d' }
-        );
+        // Générer les tokens (accès + refresh)
+        const accessToken = generateAccessToken(user);
+        const { refreshToken, tokenId } = await generateAndStoreRefreshToken(user.id);
 
         res.status(201).json({
             message: 'Inscription réussie.',
-            token,
-            user: user.toJSON()
+            token: accessToken,
+            refreshToken,
+            refreshTokenTTL: REFRESH_TOKEN_TTL_SECONDS,
+            tokenId,
+            user: user.toJSON(),
         });
     } catch (error) {
         console.error('Erreur inscription:', error);
@@ -93,17 +100,17 @@ router.post('/login', async (req, res) => {
             });
         }
 
-        // Générer le token JWT
-        const token = jwt.sign(
-            { userId: user.id, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: '7d' }
-        );
+        // Générer les tokens (accès + refresh)
+        const accessToken = generateAccessToken(user);
+        const { refreshToken, tokenId } = await generateAndStoreRefreshToken(user.id);
 
         res.json({
             message: 'Connexion réussie.',
-            token,
-            user: user.toJSON()
+            token: accessToken,
+            refreshToken,
+            refreshTokenTTL: REFRESH_TOKEN_TTL_SECONDS,
+            tokenId,
+            user: user.toJSON(),
         })
     } catch (error) {
         console.error('Erreur connexion:', error);
@@ -198,5 +205,54 @@ router.put('/change-password', authMiddleware, async (req, res) => {
         })
     }
 })
+
+// Rafraîchir le token d'accès à partir d'un refresh token
+router.post('/refresh', async (req, res) => {
+    try {
+        const { userId, tokenId, refreshToken } = req.body || {};
+
+        if (!userId || !tokenId || !refreshToken) {
+            return res.status(400).json({ message: 'Données de rafraîchissement manquantes.' });
+        }
+
+        const isValid = await verifyRefreshToken(userId, tokenId, refreshToken);
+        if (!isValid) {
+            return res.status(401).json({ message: 'Refresh token invalide ou expiré.' });
+        }
+
+        const user = await User.findByPk(userId);
+        if (!user || !user.actif) {
+            return res.status(401).json({ message: 'Utilisateur non valide ou désactivé.' });
+        }
+
+        const accessToken = generateAccessToken(user, { expiresIn: '1h' });
+
+        return res.json({
+            token: accessToken,
+            user: user.toJSON(),
+        });
+    } catch (error) {
+        console.error('Erreur lors du rafraîchissement du token:', error);
+        return res.status(500).json({ message: 'Erreur lors du rafraîchissement du token.' });
+    }
+});
+
+// Déconnexion : révoquer un refresh token
+router.post('/logout', async (req, res) => {
+    try {
+        const { userId, tokenId } = req.body || {};
+
+        if (!userId || !tokenId) {
+            return res.status(400).json({ message: 'Données de déconnexion manquantes.' });
+        }
+
+        await revokeRefreshToken(userId, tokenId);
+
+        return res.json({ message: 'Déconnexion réussie.' });
+    } catch (error) {
+        console.error('Erreur lors de la déconnexion:', error);
+        return res.status(500).json({ message: 'Erreur lors de la déconnexion.' });
+    }
+});
 
 module.exports = router;

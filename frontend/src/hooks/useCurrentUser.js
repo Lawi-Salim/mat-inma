@@ -1,6 +1,7 @@
 // frontend/src/hooks/useCurrentUser.js
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { refreshAccessTokenIfNeeded } from '../utils/auth';
 
 // Hook centralisé pour récupérer l'utilisateur connecté à partir du token
 export default function useCurrentUser() {
@@ -14,7 +15,7 @@ export default function useCurrentUser() {
         setLoading(true);
         setError(null);
 
-        const token = localStorage.getItem('token');
+        const token = await refreshAccessTokenIfNeeded();
         const config = token
           ? { headers: { Authorization: `Bearer ${token}` } }
           : undefined;
