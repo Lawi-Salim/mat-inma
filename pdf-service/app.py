@@ -17,6 +17,7 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 env = Environment(
     loader=FileSystemLoader(TEMPLATES_DIR),
     autoescape=select_autoescape(["html", "xml"]),
+    auto_reload=True,
 )
 
 app = FastAPI(title="Mat'inma PDF Service")
